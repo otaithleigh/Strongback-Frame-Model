@@ -12,7 +12,7 @@ function applyGravityLoads(obj,fid)
     fprintf(fid,'system UmfPack\n');
     fprintf(fid,'constraints %s\n', obj.optionsGravityLoads.constraints.writeArgs());
     fprintf(fid,'numberer RCM\n');
-    fprintf(fid,'%s\n', obj.optionsGravityLoads.test.genTclCode(1));
+    fprintf(fid,'test %s\n', obj.optionsGravityLoads.test.writeArgs(1));
     fprintf(fid,'algorithm %s\n',obj.optionsGravityLoads.algorithm.type{1});
     fprintf(fid,'integrator LoadControl 0.1\n');
     fprintf(fid,'analysis Static\n\n');

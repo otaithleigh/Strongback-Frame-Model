@@ -82,8 +82,8 @@ function set.normType(obj,norm_in)
 end
 
 %------------------------------- Write Tcl code -------------------------------%
-function str = genTclCode(obj, i)
-    str = sprintf('test %s %g %i %i %i', obj.type, obj.tolerance(i), obj.iterations, obj.print, obj.normType);
+function str = writeArgs(obj, i)
+    str = sprintf('%s %g %i %i %i', obj.type, obj.tolerance(i), obj.iterations, obj.print, obj.normType);
 end
 
 
