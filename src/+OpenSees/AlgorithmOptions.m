@@ -4,7 +4,7 @@ properties
     type = {'KrylovNewton'; 'Newton'; 'ModifiedNewton'};
 end
 properties (Hidden, Constant)
-    validAlgorithms  = {'Newton','KrylovNewton','ModifiedNewton'};
+    validAlgorithms  = {'Newton','KrylovNewton','ModifiedNewton', 'SecantNewton', 'BFGS'};
 end
 
 methods
