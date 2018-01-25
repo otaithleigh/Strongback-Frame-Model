@@ -1,6 +1,11 @@
 classdef ResponseHistoryOptions < handle
 
 properties
+    damping_ModeA   = 1
+    damping_ModeB   = 3
+    damping_RatioA  = 0.025
+    damping_RatioB  = 0.025
+
     constraints = OpenSees.ConstraintsOptions();
     test = OpenSees.TestOptions('tolerance',[1e-5,5e-5,1e-4]);
     algorithm = OpenSees.AlgorithmOptions();
