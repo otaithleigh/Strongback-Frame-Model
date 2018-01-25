@@ -35,15 +35,13 @@ FrameBeams      % Beam sections
 LeftBraces      % Diagonal braces
 RightBraces     % Diagonal braces in the strongback
 TieBraces       % Vertical ties in the strongback
-LeaningColumns
-LeaningBeams
 
 GussetPlates
+GussetPlateModel = 'pinned'
 
 elasticLinearBraces = false;
 elasticLinearBeams  = false;
 elasticLinearCols   = false;
-elasticLinearLeans  = true;
 
 % Material properties ----------------------------------------------------------
 
@@ -58,11 +56,13 @@ rigidE = 10e12; % Elastic modulus used for "rigid" beam-columns
 
 optionsGravityLoads = OpenSees.GravityLoadOptions
 optionsPushover     = OpenSees.PushoverOptions
+optionsResponseHistory = OpenSees.ResponseHistoryOptions
 
 % Geometric transformation used for analysis: Linear, PDelta, or Corotational
 transfType {mustBeMember(transfType, {'Linear', 'PDelta', 'Corotational'})} = 'PDelta'
 
 nIntPoints = 5                          % Number of integration points per element
+nFibers = 20
 includeExplicitPDelta = true            % Select whether to include gravity loads on the frame
 includeGeometricImperfections = false   % Select whether to include geometric imperfections (braces only)
 includeResidualStresses = true          % Select whether to include residual stresses (W-sections only)
@@ -174,6 +174,8 @@ function t = tag(kind, story, num)
         start = 6;
     case 'rigidend'
         start = 7;
+    case 'spring'
+        start = 8;
     otherwise
         error('Invalid node type: %s', kind)
     end

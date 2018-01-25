@@ -86,15 +86,54 @@ for iStory = 0:2:obj.nStories
     end
 end
 
-% Pins in the gusset plates for now
+% Attach braces to gusset plates
 for iStory = 1:obj.nStories
-    for iType = {'brace', 'sback'}
-        rTag = obj.tag(iType{1}, iStory, 1);
-        cTag = obj.tag(iType{1}, iStory, 2);
-        fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
-        rTag = obj.tag(iType{1}, iStory, obj.nBraceNodes);
-        cTag = obj.tag(iType{1}, iStory, obj.nBraceNodes-1);
-        fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+    switch obj.GussetPlateModel
+    case 'pinned'
+        for iType = {'brace', 'sback'}
+            rTag = obj.tag(iType{1}, iStory, 1);
+            cTag = obj.tag(iType{1}, iStory, 2);
+            fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+            rTag = obj.tag(iType{1}, iStory, obj.nBraceNodes);
+            cTag = obj.tag(iType{1}, iStory, obj.nBraceNodes-1);
+            fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+        end
+    case 'fixed'
+        for iType = {'brace', 'sback'}
+            rTag = obj.tag(iType{1}, iStory, 1);
+            cTag = obj.tag(iType{1}, iStory, 2);
+            fprintf(fid, 'equalDOF %4i %4i 1 2 3\n', rTag, cTag);
+            rTag = obj.tag(iType{1}, iStory, obj.nBraceNodes);
+            cTag = obj.tag(iType{1}, iStory, obj.nBraceNodes-1);
+            fprintf(fid, 'equalDOF %4i %4i 1 2 3\n', rTag, cTag);
+        end
+    case 'spring'
+        for iType = {'brace', 'sback'}
+            if strcmp(iType{1}, 'brace')
+                side = 1;
+            else
+                side = 2;
+            end
+            rTag = obj.tag(iType{1}, iStory, 1);
+            cTag = obj.tag(iType{1}, iStory, 2);
+            matTag = obj.tag('spring', iStory, side);
+            eleTag = obj.tag('spring', iStory, side);
+            Fy = obj.GussetPlates{iStory, side, 1}.Fy;
+            K = obj.GussetPlates{iStory, side, 1}.K;
+            fprintf(fid, 'uniaxialMaterial Steel02 %i %g %g 0.01 20 0.925 0.15\n', matTag, Fy, K);
+            fprintf(fid, 'element zeroLength %i %i %i -mat %i -dir 3\n', eleTag, rTag, cTag, matTag);
+            fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+
+            rTag = obj.tag(iType{1}, iStory, obj.nBraceNodes);
+            cTag = obj.tag(iType{1}, iStory, obj.nBraceNodes-1);
+            matTag = obj.tag('spring', iStory, side+2);
+            eleTag = obj.tag('spring', iStory, side+2);
+            Fy = obj.GussetPlates{iStory, side, 2}.Fy;
+            K = obj.GussetPlates{iStory, side, 2}.K;
+            fprintf(fid, 'uniaxialMaterial Steel02 %i %g %g 0.01 20 0.925 0.15\n', matTag, Fy, K);
+            fprintf(fid, 'element zeroLength %i %i %i -mat %i -dir 3\n', eleTag, rTag, cTag, matTag);
+            fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+        end
     end
 end
 
