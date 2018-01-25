@@ -5,6 +5,8 @@ properties
     shape           % Steel shape used for the member
     story           % Story the member is located on
     type
+    nFibers         % Number of fibers per section
+    orientation = 'strong'     % Orientation of the member ('strong' or 'weak')
 
     storyHeight
     bracePos
@@ -25,6 +27,7 @@ function obj = FrameMember(frame, shape, story, type)
     obj.storyHeight = frame.storyHeight(story);
     obj.bracePos    = frame.bracePos;
     obj.bayWidth    = frame.bayWidth;
+    obj.nFibers     = frame.nFibers;
 
     obj.shape       = shape;
     obj.story       = story;
@@ -74,14 +77,14 @@ function code = OpenSeesSection(obj, secTag, matTag)
     case 'W'
         frc = -obj.residualStressFactor*Fy;
         nSectors = obj.nResidualStressSectors;
-        nf1 = 20;
-        nf2 = 'strong';
+        nf1 = obj.nFibers;
+        nf2 = obj.orientation;
         d = obj.shape.d;
         tw = obj.shape.tw;
         bf = obj.shape.bf;
         tf = obj.shape.tf;
 
-        mat = sprintf('-ElasticPP %i %g %g', matTag, Es, Fy);
+        mat = sprintf('-Steel02 %i %g %g 0.003', matTag, Es, Fy);
         if obj.includeResidualStresses
             residual = sprintf(' -Lehigh %g %i', frc, nSectors);
         else
@@ -94,8 +97,8 @@ function code = OpenSeesSection(obj, secTag, matTag)
         B  = obj.shape.B;
         D  = obj.shape.Ht;
         units = obj.shape.Units;
-        nf1 = 20;
-        nf2 = 'strong';
+        nf1 = obj.nFibers;
+        nf2 = obj.orientation;
 
         code = sprintf('OpenSeesComposite::recthssSection %i %i %i %s %s %g %g %g %g %g %g -SteelMaterialType %s',...
             secTag, matTag, nf1, nf2, units, D, B, t, Fy, Fu, Es, 'Steel02');
