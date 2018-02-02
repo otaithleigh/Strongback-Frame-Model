@@ -29,29 +29,44 @@ frame.liveLoad      = [ 0, 0, 0, 0 ];
 %% Analysis options
 %------------------------------------------------------------------------------%
 % General
-frame.echoOpenSeesOutput        = false;
+frame.echoOpenSeesOutput        = true;
 frame.deleteFilesAfterAnalysis  = false;
 
 % Elements
 frame.transfType = 'Corotational';  % Geometric transformation for all elements
-frame.nIntPoints = 4;               % Number of integration points per element
+frame.nIntPoints = 3;               % Number of integration points per element
 frame.nFibers    = 20;              % Number of fibers per section
 frame.nBraceEle  = 8;               % Number of elements per brace member
 frame.nColumnEle = 8;               % Number of elements per column member
 frame.nBeamEle   = 4;               % Number of elements per half-beam member
 
+frame.elementFormulation = 'force';
+frame.elementIterative   = false;
+frame.elementTolerance   = 1e-12;
+frame.elementIterations  = 10;
+
+frame.leftColumnFixity  = 'pinned';
+frame.rightColumnFixity = 'pinned';
+
 % Materials
 frame.rigidE                    = 10e9;     % Elastic modulus of "rigid" elements
 frame.includeResidualStresses   = true;     % Select whether to include residual stresses in material models
+frame.nResidualStressSectors    = 20;
 frame.GussetPlateModel          = 'spring'; % Select how to model gusset plate connections
 
+frame.elasticLinearBraces = false;
+frame.elasticLinearBeams  = false;
+frame.elasticLinearCols   = false;
+
 % Pushover
-frame.optionsPushover.stepSize          = [1e-2, 1e-3, 1e-5, 1e-7];
-frame.optionsPushover.maxDrift          = 24.0; % in.
+frame.optionsPushover.stepSize          = [1e-3, 1e-5, 1e-7, 1e-9];
+% frame.optionsPushover.stepSize          = logspace(-2, -6, 3);
+frame.optionsPushover.maxDrift          = 24; % in.
 frame.optionsPushover.controlStory      = 'roof';
-frame.optionsPushover.test.tolerance    = [1e-5, 1e-4, 1e-3];
-frame.optionsPushover.test.iterations   = 30;
-frame.optionsPushover.algorithm.type    = {'KrylovNewton', 'SecantNewton', 'BFGS'};
+frame.optionsPushover.test.tolerance    = [1e-5, 1e-4, 1e-3, 1e-2];
+frame.optionsPushover.test.iterations   = 60;
+frame.optionsPushover.test.print        = 2;
+frame.optionsPushover.algorithm.type    = {'KrylovNewton', 'SecantNewton', 'BFGS', 'ModifiedNewton'};
 
 % Response history
 gm_mat = '/home/petertalley/Dropbox/Research/Strongback-Frame-Model/test/ground_motions.mat';
@@ -68,28 +83,28 @@ frame.optionsResponseHistory.algorithm.type  = {'KrylovNewton', 'SecantNewton', 
 t = SteelSection.readShapesTable('US');
 
 frame.LeftColumns = {
-    FrameMember(frame, SteelSection('W14x82', 'US', t), 1, 'column')
-    FrameMember(frame, SteelSection('W14x82', 'US', t), 2, 'column')
+    FrameMember(frame, SteelSection('W14x90', 'US', t), 1, 'column')
+    FrameMember(frame, SteelSection('W14x90', 'US', t), 2, 'column')
     FrameMember(frame, SteelSection('W14x68', 'US', t), 3, 'column')
     FrameMember(frame, SteelSection('W14x68', 'US', t), 4, 'column')
 };
 
 frame.RightColumns = {
-    FrameMember(frame, SteelSection('W14x82', 'US', t), 1, 'column')
-    FrameMember(frame, SteelSection('W14x82', 'US', t), 2, 'column')
+    FrameMember(frame, SteelSection('W14x90', 'US', t), 1, 'column')
+    FrameMember(frame, SteelSection('W14x90', 'US', t), 2, 'column')
     FrameMember(frame, SteelSection('W14x68', 'US', t), 3, 'column')
     FrameMember(frame, SteelSection('W14x68', 'US', t), 4, 'column')
 };
 
 frame.FrameBeams = {
-    FrameMember(frame, SteelSection('W24x335', 'US', t), 1, 'beam')
-    FrameMember(frame, SteelSection('W18x192', 'US', t), 2, 'beam')
-    FrameMember(frame, SteelSection('W18x192', 'US', t), 3, 'beam')
+    FrameMember(frame, SteelSection('W33x291', 'US', t), 1, 'beam')
+    FrameMember(frame, SteelSection('W33x118', 'US', t), 2, 'beam')
+    FrameMember(frame, SteelSection('W33x118', 'US', t), 3, 'beam')
     FrameMember(frame, SteelSection('W14x68', 'US', t), 4, 'beam')
 };
 
 frame.LeftBraces = {
-    FrameMember(frame, SteelSection('HSS4-1/2x4-1/2x5/16', 'US', t), 1, 'brace')
+    FrameMember(frame, SteelSection('HSS4-1/2x4-1/2x1/2', 'US', t), 1, 'brace')
     FrameMember(frame, SteelSection('HSS4-1/2x4-1/2x5/16', 'US', t), 2, 'brace')
     FrameMember(frame, SteelSection('HSS4x4x5/16', 'US', t), 3, 'brace')
     FrameMember(frame, SteelSection('HSS3x3x1/4', 'US', t), 4, 'brace')
@@ -103,7 +118,7 @@ frame.TieBraces = {
 };
 
 frame.RightBraces = {
-    FrameMember(frame, SteelSection('HSS5x5x1/2', 'US', t), 1, 'sback')
+    FrameMember(frame, SteelSection('HSS7x7x1/2', 'US', t), 1, 'sback')
     FrameMember(frame, SteelSection('HSS5x5x1/2', 'US', t), 2, 'sback')
     FrameMember(frame, SteelSection('HSS5x5x1/2', 'US', t), 3, 'sback')
     FrameMember(frame, SteelSection('HSS4x4x5/16', 'US', t), 4, 'sback')
@@ -119,10 +134,12 @@ frame.designGussetPlates();
 tic
 F = frame.pushoverForceDistribution();
 pushover = frame.pushover(F, 'targetPostPeakRatio', 0.80);
-fprintf('Pushover took %g seconds\n', toc)
-fprintf('Analysis ended at a roof drift of %g in.\n\n', pushover.roofDrift(end));
+pushover.runTime = toc;
+fprintf('Pushover took %g seconds\n', pushover.runTime)
+fprintf('Analysis ended at a roof drift of %g in.\n\n', pushover.roofDrift(end))
 
 frame.plotPushoverCurve(pushover)
+frame.plotStoryDrifts(pushover, 'singleplot')
 
 % Response history
 tic
@@ -136,8 +153,9 @@ dlmwrite(gmFile,accel*frame.g);
 
 
 rh = frame.responseHistory(gmFile, dt, SF, tEnd, gmID, 1);
-fprintf('Response history took %g seconds\n', toc)
-fprintf('Analysis ended at %g seconds into the time series\n\n', rh.time(end));
+rh.runTime = toc;
+fprintf('Response history took %g seconds\n', rh.runTime)
+fprintf('Analysis ended at %g seconds into the time series\n\n', rh.time(end))
 
 figure
 plot(rh.time, rh.roofDrift);
