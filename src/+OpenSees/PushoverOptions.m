@@ -20,18 +20,20 @@ end
 
 methods
 
-function set.controlStory(obj,controlStory)
-    if ~strcmp(controlStory,'roof') || controlStory > nStories
-        error('Control story must be less than or equal to number of stories')
-    end
-    obj.controlStory = controlStory;
-end
-function set.stepSize(obj,stepSize)
-    if ~isnumeric(stepSize) || ~isscalar(stepSize) || stepSize < 0
-        error('stepSize must be a positive scalar')
-    end
-    obj.stepSize = stepSize;
-end
+% FIXME: controlStory can be 'roof' or a number, error checking not working right
+% function set.controlStory(obj,controlStory)
+%     if ~strcmp(controlStory,'roof') || controlStory < 1
+%         error('Control story must be ''roof'' or a positive integer')
+%     end
+%     obj.controlStory = controlStory;
+% end
+% FIXME: stepSize can be a vector now
+% function set.stepSize(obj,stepSize)
+%     if ~isnumeric(stepSize) || ~isscalar(stepSize) || stepSize < 0
+%         error('stepSize must be a positive scalar')
+%     end
+%     obj.stepSize = stepSize;
+% end
 function set.maxDrift(obj,maxDrift)
     if ~isnumeric(maxDrift) || ~isscalar(maxDrift) || maxDrift < 0
         error('maxDrift must be a positive scalar')
