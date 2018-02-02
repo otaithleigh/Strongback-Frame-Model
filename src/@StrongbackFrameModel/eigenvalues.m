@@ -33,7 +33,7 @@ fprintf(fid,'set eigfid [open %s w+]\n',obj.path_for_tcl(filename_vals));
 fprintf(fid,'set vecfid [open %s w+]\n',obj.path_for_tcl(filename_vecs));
 fprintf(fid,'puts $eigfid $eigs\n');
 for i = 1:obj.nStories
-    fprintf(fid,'puts $vecfid [nodeEigenvector %i 1]\n', obj.tag(pos, i, 1));
+    fprintf(fid,'puts $vecfid [nodeEigenvector %i 1 1]\n', obj.tag(pos, i, 1));
 end
 fprintf(fid,'close $eigfid\n');
 fprintf(fid,'close $vecfid\n');
