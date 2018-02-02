@@ -32,9 +32,18 @@ for i = {'left', 'right', 'lean'}
     fprintf(fid, 'fix %4i 1 1 1\n', obj.tag(i{1}, 0, 0));
 end
 
-% Pinned column bases
-for i = {'left', 'right'}
-    fprintf(fid, 'equalDOF %4i %4i 1 2\n', obj.tag(i{1},0,0), obj.tag(i{1},0,1));
+% Column bases
+switch obj.leftColumnFixity
+case 'pinned'
+    fprintf(fid, 'equalDOF %4i %4i 1 2\n', obj.tag('left',0,0), obj.tag('left',0,1));
+case 'fixed'
+    fprintf(fid, 'equalDOF %4i %4i 1 2 3\n', obj.tag('left',0,0), obj.tag('left',0,1));
+end
+switch obj.rightColumnFixity
+case 'pinned'
+    fprintf(fid, 'equalDOF %4i %4i 1 2\n', obj.tag('right',0,0), obj.tag('right',0,1));
+case 'fixed'
+    fprintf(fid, 'equalDOF %4i %4i 1 2 3\n', obj.tag('right',0,0), obj.tag('right',0,1));
 end
 fprintf(fid, 'equalDOF %4i %4i 1 2\n', obj.tag('lean',0,0), obj.tag('lean',1,2));
 fprintf(fid, '\n');
@@ -284,7 +293,19 @@ for iType = {'left', 'right'}
                     jNode = obj.tag(iType{1}, iStory-1, 1);
                 end
             end
-            fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n', eleTag, iNode, jNode, transfTag, integration);
+            switch obj.elementFormulation
+            case 'displacement'
+                fprintf(fid, 'element dispBeamColumn %4i %4i %4i %i %i %i -integration Lobatto\n',...
+                    eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
+            case 'force'
+                if obj.elementIterative
+                    fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s" -iter %i %g\n',...
+                        eleTag, iNode, jNode, transfTag, integration, obj.elementIterations, obj.elementTolerance);
+                else
+                    fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
+                        eleTag, iNode, jNode, transfTag, integration);
+                end
+            end
         end
     end
 end
@@ -340,7 +361,19 @@ for iStory = 1:obj.nStories
                 jNode = obj.tag('beam', iStory, obj.beamRightEnd(iStory));
             end
         end
-        fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n', eleTag, iNode, jNode, transfTag, integration);
+        switch obj.elementFormulation
+        case 'displacement'
+            fprintf(fid, 'element dispBeamColumn %4i %4i %4i %i %i %i -integration Lobatto\n',...
+                eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
+        case 'force'
+            if obj.elementIterative
+                fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s" -iter %i %g\n',...
+                    eleTag, iNode, jNode, transfTag, integration, obj.elementIterations, obj.elementTolerance);
+            else
+                fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
+                    eleTag, iNode, jNode, transfTag, integration);
+            end
+        end
     end
 end
 
@@ -354,7 +387,19 @@ for iType = {'brace', 'sback'}
             eleTag = obj.tag(iType{1}, iStory, iEle);
             iNode = obj.tag(iType{1}, iStory, iStart + iEle - 1);
             jNode = obj.tag(iType{1}, iStory, iStart + iEle);
-            fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n', eleTag, iNode, jNode, transfTag, integration);
+            switch obj.elementFormulation
+            case 'displacement'
+                fprintf(fid, 'element dispBeamColumn %4i %4i %4i %i %i %i -integration Lobatto\n',...
+                    eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
+            case 'force'
+                if obj.elementIterative
+                    fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s" -iter %i %g\n',...
+                        eleTag, iNode, jNode, transfTag, integration, obj.elementIterations, obj.elementTolerance);
+                else
+                    fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
+                        eleTag, iNode, jNode, transfTag, integration);
+                end
+            end
         end
     end
 end
@@ -368,7 +413,19 @@ for iStory = 1:obj.nStories
             eleTag = obj.tag('tie', iStory, iEle);
             iNode = obj.tag('tie', iStory, iEle);
             jNode = obj.tag('tie', iStory, iEle+1);
-            fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n', eleTag, iNode, jNode, transfTag, integration);
+            switch obj.elementFormulation
+            case 'displacement'
+                fprintf(fid, 'element dispBeamColumn %4i %4i %4i %i %i %i -integration Lobatto\n',...
+                    eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
+            case 'force'
+                if obj.elementIterative
+                    fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s" -iter %i %g\n',...
+                        eleTag, iNode, jNode, transfTag, integration, obj.elementIterations, obj.elementTolerance);
+                else
+                    fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
+                        eleTag, iNode, jNode, transfTag, integration);
+                end
+            end
         end
     end
 end

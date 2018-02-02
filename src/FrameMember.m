@@ -1,20 +1,21 @@
 classdef FrameMember < handle
 
 properties
-    material        % Material the member is made of
-    shape           % Steel shape used for the member
-    story           % Story the member is located on
-    type
-    nFibers         % Number of fibers per section
-    orientation = 'strong'     % Orientation of the member ('strong' or 'weak')
+    material                % Material the member is made of
+    shape                   % Steel shape used for the member
+    story                   % Story the member is located on
+    type                    % Type of member
+    elastic = false         % Toggles whether to use elastic section
+    nFibers                 % Number of fibers per section
+    orientation = 'strong'  % Orientation of the member ('strong' or 'weak')
 
-    storyHeight
-    bracePos
-    bayWidth
+    storyHeight             % Height of story the member is located on
+    bracePos                % Position of brace intersection
+    bayWidth                % Width of frame bay
 
-    includeResidualStresses
-    residualStressFactor
-    nResidualStressSectors
+    includeResidualStresses % Toggles whether to include residual stresses
+    residualStressFactor    % Maximum residual stress, as a percent of yield
+    nResidualStressSectors  % Number of "steps" used to make residual stress pattern
 end
 
 properties (Dependent)
@@ -39,16 +40,29 @@ function obj = FrameMember(frame, shape, story, type)
     switch lower(type)
     case 'column'
         obj.material = frame.ColumnMat;
+        if frame.elasticLinearCols
+            obj.elastic = true;
+        end
     case 'beam'
         obj.material = frame.BeamMat;
+        if frame.elasticLinearBeams
+            obj.elastic = true;
+        end
     case 'brace'
         obj.material = frame.BraceMat;
+        if frame.elasticLinearBraces
+            obj.elastic = true;
+        end
     case 'sback'
         obj.material = frame.BraceMat;
+        if frame.elasticLinearBraces
+            obj.elastic = true;
+        end
     case 'tie'
         obj.material = frame.BraceMat;
-    case 'lean'
-        obj.material = SteelDesign.SteelMaterial('Elastic');
+        if frame.elasticLinearBraces
+            obj.elastic = true;
+        end
     otherwise
         error('Invalid member type: %s', type)
     end
@@ -84,7 +98,11 @@ function code = OpenSeesSection(obj, secTag, matTag)
         bf = obj.shape.bf;
         tf = obj.shape.tf;
 
-        mat = sprintf('-Steel02 %i %g %g 0.003', matTag, Es, Fy);
+        if obj.elastic
+            mat = sprintf('-Elastic %i %g', matTag, Es);
+        else
+            mat = sprintf('-Steel02 %i %g %g 0.003', matTag, Es, Fy);
+        end
         if obj.includeResidualStresses
             residual = sprintf(' -Lehigh %g %i', frc, nSectors);
         else
@@ -99,9 +117,14 @@ function code = OpenSeesSection(obj, secTag, matTag)
         units = obj.shape.Units;
         nf1 = obj.nFibers;
         nf2 = obj.orientation;
+        if obj.elastic
+            mat = 'Elastic';
+        else
+            mat = 'Steel02';
+        end
 
         code = sprintf('OpenSeesComposite::recthssSection %i %i %i %s %s %g %g %g %g %g %g -SteelMaterialType %s',...
-            secTag, matTag, nf1, nf2, units, D, B, t, Fy, Fu, Es, 'Steel02');
+            secTag, matTag, nf1, nf2, units, D, B, t, Fy, Fu, Es, mat);
     end
 end
 

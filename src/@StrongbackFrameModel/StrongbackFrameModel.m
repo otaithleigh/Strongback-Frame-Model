@@ -43,6 +43,14 @@ elasticLinearBraces = false;
 elasticLinearBeams  = false;
 elasticLinearCols   = false;
 
+elementFormulation = 'force'    % Nonlinear element type: 'force' or 'displacement'
+elementIterative   = false      % Select whether to use iterative element formulation
+elementIterations  = 10         % Number of iterations for iterative element formulation
+elementTolerance   = 1e-12      % Tolerance for iterative element formulation
+
+leftColumnFixity  = 'pinned'    % Fixity of the base of the left column line
+rightColumnFixity = 'pinned'    % Fixity of the base of the right column line
+
 % Material properties ----------------------------------------------------------
 
 ColumnMat = SteelDesign.SteelMaterial('A992')
