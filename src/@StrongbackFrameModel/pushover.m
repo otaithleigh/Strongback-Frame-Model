@@ -101,6 +101,7 @@ switch lower(type)
     case 'targetpostpeakratio'
         fprintf(fid,'set currentLoad [getTime]\n');
         fprintf(fid,'set maxLoad $currentLoad\n');
+        fprintf(fid,'set prevNodeDisp [nodeDisp %i 1]\n',controlNode(obj));
         fprintf(fid,'while { $currentLoad >= [expr %g*$maxLoad] } {\n',targetPostPeakRatio);
         fprintf(fid,'\talgorithm %s\n',obj.optionsPushover.algorithm.type{1});
         fprintf(fid,'\ttest %s\n',obj.optionsPushover.test.writeArgs(1));
@@ -129,6 +130,10 @@ switch lower(type)
         fprintf(fid,'\tif { [nodeDisp %i 1] > %g } {\n',controlNode(obj),obj.optionsPushover.maxDrift);
         fprintf(fid,'\t\texit 3\n');
         fprintf(fid,'\t}\n');
+        fprintf(fid,'\tset curNodeDisp [nodeDisp %i 1]\n',controlNode(obj));
+        fprintf(fid,'\tset dispChange [expr $curNodeDisp-$prevNodeDisp]\n');
+        fprintf(fid,'\tset prevNodeDisp $curNodeDisp\n');
+        fprintf(fid,'\tputs "\\nControl story displacement is now $curNodeDisp %s, a change of $dispChange %s\\n"\n',obj.units.length,obj.units.length);
         fprintf(fid,'}\n');
     otherwise
         error('Unknown analysis type: %s',type);
