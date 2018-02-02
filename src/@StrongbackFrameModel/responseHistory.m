@@ -81,7 +81,7 @@ fprintf(fid,'while { $currentTime < %g } {\n',tEnd);
 fprintf(fid,'    algorithm %s\n',obj.optionsResponseHistory.algorithm.type{1});
 fprintf(fid,'    test %s\n',obj.optionsResponseHistory.test.writeArgs(1));
 fprintf(fid,'    set ok [analyze 1 %g]\n',dt);
-for i = 1:length(obj.optionsPushover.test.tolerance)
+for i = 1:length(obj.optionsResponseHistory.test.tolerance)
     if i == 1, k = 2; else, k = 1; end
     for j = k:length(obj.optionsResponseHistory.algorithm.type)
         fprintf(fid,'    if { $ok != 0 } {\n');
