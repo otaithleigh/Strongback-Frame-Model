@@ -9,12 +9,7 @@ function F = pushoverForceDistribution(obj)
 
 [~,eigenvecs] = obj.eigenvalues;
 
-storyMass = zeros(obj.nStories, 1);
-for i = 1:obj.nStories
-    storyMass(i) = obj.nodalMass(i, 'left') + obj.nodalMass(i, 'right') + obj.nodalMass(i, 'lean');
-end
-
-F = storyMass .* eigenvecs;
+F = obj.storyMass .* eigenvecs;
 if min(F) < 0
     F = -F;
 end

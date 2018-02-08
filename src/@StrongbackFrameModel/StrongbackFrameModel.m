@@ -81,12 +81,7 @@ end
 
 
 properties (Dependent) %--------------------------------------------------------
-    braceAngle      % Undeflected angle of brace with level below, deg
-    braceLength     % Undeflected length of brace
-    braceImperf     % Initial imperfection perpendicular to brace at brace midspan
-    braceImperf_X   % X-component of initial brace imperfection
-    braceImperf_Y   % Y-component of initial brace imperfection
-
+    storyMass       % Total mass of each story
     nBraceNodes     % Number of nodes that comprise a brace
 
 end
@@ -98,24 +93,13 @@ function obj = StrongbackFrameModel()
 %StrongbackFrameModel  Constructor
 end
 
-function braceAngle = get.braceAngle(obj)
-    braceAngle = atand(obj.storyHeight / (obj.bracePos*obj.bayWidth));
-end
-
-function braceLength = get.braceLength(obj)
-    braceLength = obj.bayWidth * secd(obj.braceAngle);
-end
-
-function braceImperf = get.braceImperf(obj)
-    braceImperf = obj.imperf * obj.braceLength;
-end
-
-function braceImperf_X = get.braceImperf_X(obj)
-    braceImperf_X = obj.braceImperf * sind(obj.braceAngle);
-end
-
-function braceImperf_Y = get.braceImperf_Y(obj)
-    braceImperf_Y = obj.braceImperf * cosd(obj.braceAngle);
+function storyMass = get.storyMass(obj)
+    storyMass = zeros(obj.nStories, 1);
+    for i = 1:obj.nStories
+        storyMass(i) = obj.nodalMass(i, 'left') ...
+                     + obj.nodalMass(i, 'right') ...
+                     + obj.nodalMass(i, 'lean');
+    end
 end
 
 function nBraceNodes = get.nBraceNodes(obj)
