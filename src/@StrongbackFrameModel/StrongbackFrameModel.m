@@ -4,8 +4,12 @@ classdef StrongbackFrameModel < OpenSeesAnalysis
 properties
 % General properties -----------------------------------------------------------
 
-g               % Acceleration due to gravity
-units           % Units of the model: force, length, time
+g                       % Acceleration due to gravity
+units                   % Units of the model: force, length, time
+seismicDesignCategory   % FEMA P695 seismic design category
+fundamentalPeriod       % Fundamental period
+respModCoeff            % Response modification coefficient (R)
+impFactor               % Seismic importance factor (I_e)
 
 % Geometric properties (global) ------------------------------------------------
 
@@ -37,11 +41,15 @@ RightBraces     % Diagonal braces in the strongback
 TieBraces       % Vertical ties in the strongback
 
 GussetPlates                    % Cell containing gusset plate definitions. {story, side, num}
-GussetPlateModel = 'pinned'     %
+GussetPlateModel = 'pinned'     % Model used for gusset plate springs (pinned, fixed, spring, elastic)
+
+% Elastic member switches
 
 elasticLinearBraces = false;
 elasticLinearBeams  = false;
 elasticLinearCols   = false;
+
+% Element options
 
 elementFormulation = 'force'    % Nonlinear element type: 'force', 'displacement', or 'mixed'
 elementIterative   = false      % Select whether to use iterative element formulation
