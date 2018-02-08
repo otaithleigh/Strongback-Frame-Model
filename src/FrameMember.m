@@ -120,7 +120,7 @@ function code = OpenSeesSection(obj, secTag, matTag)
         if obj.elastic
             mat = 'Elastic';
         else
-            mat = 'Steel02';
+            mat = 'AbdelRahman';
         end
 
         code = sprintf('OpenSeesComposite::recthssSection %i %i %i %s %s %g %g %g %g %g %g -SteelMaterialType %s',...
