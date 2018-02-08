@@ -101,15 +101,18 @@ function code = OpenSeesSection(obj, secTag, matTag)
         if obj.elastic
             mat = sprintf('-Elastic %i %g', matTag, Es);
         else
-            mat = sprintf('-Steel02 %i %g %g 0.003', matTag, Es, Fy);
+            % mat = sprintf('-Steel02 %i %g %g 0.003', matTag, Es, Fy);
+            mat = sprintf('-matTag %i', matTag);
         end
         if obj.includeResidualStresses
             residual = sprintf(' -Lehigh %g %i', frc, nSectors);
         else
             residual = sprintf(' -Lehigh 0 0');
         end
-        code = sprintf('OpenSeesComposite::wfSection %i %i %s %g %g %g %g %s%s',...
-            secTag, nf1, nf2, d, tw, bf, tf, mat, residual);
+        code = sprintf('uniaxialMaterial Steel01 %i %g %g %g\nOpenSeesComposite::wfSection %i %i %s %g %g %g %g %s',...
+            matTag, Fy, Es, 0.003, secTag, nf1, nf2, d, tw, bf, tf, mat);
+        % code = sprintf('OpenSeesComposite::wfSection %i %i %s %g %g %g %g %s%s',...
+        %     secTag, nf1, nf2, d, tw, bf, tf, mat, residual);
     case 'HSS'
         t  = obj.shape.tdes;
         B  = obj.shape.B;
