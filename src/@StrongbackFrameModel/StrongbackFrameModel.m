@@ -156,7 +156,22 @@ function t = tag(kind, story, num)
 %tag  Retrieve the appropriate OpenSees tag
 %
 %   t = tag(kind, story, num)
+%       story and num can be specified as vectors. For example:
 %
+%>> t = tag('right', 1:4, 1:4)
+%t =
+%        1101        1201        1301        1401
+%        1102        1202        1302        1402
+%        1103        1203        1303        1403
+%        1104        1204        1304        1404
+%
+    if iscolumn(story)
+        story = story';
+    end
+    if ~iscolumn(num)
+        num = num';
+    end
+
     switch lower(kind)
     case 'left'
         start = 0;
