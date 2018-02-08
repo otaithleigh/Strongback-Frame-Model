@@ -7,22 +7,22 @@ properties
     damping_RatioB  = 0.025
 
     constraints = OpenSees.ConstraintsOptions();
-    test = OpenSees.TestOptions('tolerance',[1e-5,5e-5,1e-4]);
+    test = OpenSees.TestOptions();
     algorithm = OpenSees.AlgorithmOptions();
 end
 
 methods
 
 function set.constraints(obj,constraints)
-    assert(isa(constraints,'ConstraintsOptions'), 'constraints must be a ConstraintsOptions object')
+    assert(isa(constraints,'OpenSees.ConstraintsOptions'), 'constraints must be a ConstraintsOptions object')
     obj.constraints = constraints;
 end
 function set.test(obj,test)
-    assert(isa(test,'TestOptions'), 'test must be a TestOptions object')
+    assert(isa(test,'OpenSees.TestOptions'), 'test must be a TestOptions object')
     obj.test = test;
 end
 function set.algorithm(obj,algorithm)
-    assert(isa(algorithm,'AlgorithmOptions'), 'algorithm must be a AlgorithmOptions object')
+    assert(isa(algorithm,'OpenSees.AlgorithmOptions'), 'algorithm must be a AlgorithmOptions object')
     obj.algorithm = algorithm;
 end
 
