@@ -78,8 +78,8 @@ fprintf(fid,'#---------------------------------- Recorders ---------------------
 fprintf(fid,'recorder Node -file {%s} -timeSeries 1 -node 0 -dof 1 accel\n',filenames.timeSeries);
 fprintf(fid,'recorder Node -file {%s} -nodeRange 0 %i -dof 1 2 disp\n',filenames.disp_all,8000);
 OpenSees.nodeRecorder(fid, filenames.story_disp, obj.tag('right',1:obj.nStories,1), 1, 'disp');
-OpenSees.eleRecorder(fid, filenames.local_brace, obj.tag('brace',1:obj.nStories,1), [], 'localForce');
-OpenSees.eleRecorder(fid, filenames.local_sback, obj.tag('sback',1:obj.nStories,1), [], 'localForce');
+OpenSees.eleRecorder(fid, filenames.local_brace, obj.tag('brace',1:obj.nStories,1:obj.nBraceEle), [], 'localForce');
+OpenSees.eleRecorder(fid, filenames.local_sback, obj.tag('sback',1:obj.nStories,1:obj.nBraceEle), [], 'localForce');
 
 fprintf(fid,'file delete %s\n', filenames.nodeCoords);
 fprintf(fid,'print {%s} -node\n', filenames.nodeCoords);
@@ -171,6 +171,28 @@ results.disp_y = temp(:, 2:2:end);
 coords = OpenSees.readNodeCoords(filenames.nodeCoords, 2);
 results.coords_x = coords(:,1)';
 results.coords_y = coords(:,2)';
+
+temp = dlmread(filenames.local_brace);
+axial               = temp(:,1:3:end);
+axial(:,1:2:end)    = -axial(:,1:2:end);
+results.brace_axial = axial;
+shear               = temp(:,2:3:end);
+shear(:,2:2:end)    = -shear(:,2:2:end);
+results.brace_shear = shear;
+moment              = temp(:,3:3:end);
+moment(:,1:2:end)   = -moment(:,1:2:end);
+results.brace_moment = moment;
+
+temp = dlmread(filenames.local_sback);
+axial               = temp(:,1:3:end);
+axial(:,1:2:end)    = -axial(:,1:2:end);
+results.sback_axial = axial;
+shear               = temp(:,2:3:end);
+shear(:,2:2:end)    = -shear(:,2:2:end);
+results.sback_shear = shear;
+moment              = temp(:,3:3:end);
+moment(:,1:2:end)   = -moment(:,1:2:end);
+results.sback_moment = moment;
 
 %------------------------------ Computed Results ------------------------------%
 storyDrift                  = results.story_disp_x;
