@@ -305,6 +305,9 @@ for iType = {'left', 'right'}
                     fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
                         eleTag, iNode, jNode, transfTag, integration);
                 end
+            case 'mixed'
+                fprintf(fid, 'element mixedBeamColumn2d %4i %4i %4i %i %4i %i\n',...
+                    eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
             end
         end
     end
@@ -373,6 +376,9 @@ for iStory = 1:obj.nStories
                 fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
                     eleTag, iNode, jNode, transfTag, integration);
             end
+        case 'mixed'
+            fprintf(fid, 'element mixedBeamColumn2d %4i %4i %4i %i %4i %i\n',...
+                eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
         end
     end
 end
@@ -399,6 +405,9 @@ for iType = {'brace', 'sback'}
                     fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
                         eleTag, iNode, jNode, transfTag, integration);
                 end
+            case 'mixed'
+                fprintf(fid, 'element mixedBeamColumn2d %4i %4i %4i %i %4i %i\n',...
+                    eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
             end
         end
     end
@@ -425,6 +434,9 @@ for iStory = 1:obj.nStories
                     fprintf(fid, 'element forceBeamColumn %4i %4i %4i %i "%s"\n',...
                         eleTag, iNode, jNode, transfTag, integration);
                 end
+            case 'mixed'
+                fprintf(fid, 'element mixedBeamColumn2d %4i %4i %4i %i %4i %i\n',...
+                    eleTag, iNode, jNode, obj.nIntPoints, secTag, transfTag);
             end
         end
     end

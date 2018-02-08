@@ -19,7 +19,7 @@ bracePos = 0.5  % Position of brace intersection with beams, as a ratio of bay w
 nBraceEle       % Number of elements per brace
 nColumnEle      % Number of elements per column
 nBeamEle        % Number of elements per beam (from column to brace)
-imperf          % Ratio of length used for initial brace imperfections
+imperf = 0      % Ratio of length used for initial brace imperfections
 
 % Frame loading ----------------------------------------------------------------
 
@@ -36,14 +36,14 @@ LeftBraces      % Diagonal braces
 RightBraces     % Diagonal braces in the strongback
 TieBraces       % Vertical ties in the strongback
 
-GussetPlates
-GussetPlateModel = 'pinned'
+GussetPlates                    % Cell containing gusset plate definitions. {story, side, num}
+GussetPlateModel = 'pinned'     %
 
 elasticLinearBraces = false;
 elasticLinearBeams  = false;
 elasticLinearCols   = false;
 
-elementFormulation = 'force'    % Nonlinear element type: 'force' or 'displacement'
+elementFormulation = 'force'    % Nonlinear element type: 'force', 'displacement', or 'mixed'
 elementIterative   = false      % Select whether to use iterative element formulation
 elementIterations  = 10         % Number of iterations for iterative element formulation
 elementTolerance   = 1e-12      % Tolerance for iterative element formulation
@@ -58,7 +58,7 @@ BeamMat   = SteelDesign.SteelMaterial('A992')
 BraceMat  = SteelDesign.SteelMaterial('A500 Gr. C')
 PlateMat  = SteelDesign.SteelMaterial('A572 Gr. 50', 'Plate')
 
-rigidE = 10e12; % Elastic modulus used for "rigid" beam-columns
+rigidE = 1e12; % Elastic modulus used for "rigid" beam-columns
 
 % Analysis options -------------------------------------------------------------
 
