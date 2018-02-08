@@ -38,6 +38,8 @@ filenames.input       = obj.scratchFile(sprintf('%s_responseHistory_input_%s_%i.
 filenames.timeSeries  = obj.scratchFile(sprintf('%s_responseHistory_timeSeries_%s_%i.out' ,class(obj),gmID,indexNum));
 filenames.nodeCoords  = obj.scratchFile(sprintf('%s_responseHistory_node_coord_%s_%i.out' ,class(obj),gmID,indexNum));
 filenames.disp_all    = obj.scratchFile(sprintf('%s_responseHistory_disp_all_%s_%i.out'   ,class(obj),gmID,indexNum));
+filenames.energy_disp = obj.scratchFile(sprintf('%s_responseHistory_energy_disp_%s_%i.out',class(obj),gmID,indexNum));
+filenames.energy_vel  = obj.scratchFile(sprintf('%s_responseHistory_energy_vel_%s_%i.out' ,class(obj),gmID,indexNum));
 filenames.story_disp  = obj.scratchFile(sprintf('%s_responseHistory_story_disp_%s_%i.out' ,class(obj),gmID,indexNum));
 filenames.reaction    = obj.scratchFile(sprintf('%s_responseHistory_reaction_%s_%i.out'   ,class(obj),gmID,indexNum));
 
@@ -56,6 +58,8 @@ fprintf(fid,'pattern UniformExcitation 1 1 -accel 1\n\n');
 fprintf(fid,'#---------------------------------- Recorders ---------------------------------#\n');
 fprintf(fid,'recorder Node -file {%s} -time -timeSeries 1 -node 0 -dof 1 accel\n',filenames.timeSeries);
 fprintf(fid,'recorder Node -file {%s} -nodeRange 0 %i -dof 1 2 disp\n',filenames.disp_all,8000);
+OpenSees.nodeRecorder(fid, filenames.energy_disp, obj.massNodes, 2, 'disp');
+OpenSees.nodeRecorder(fid, filenames.energy_vel, obj.massNodes, 1, 'vel');
 OpenSees.nodeRecorder(fid, filenames.story_disp, obj.tag('right',1:obj.nStories,1), 1, 'disp');
 OpenSees.nodeRecorder(fid, filenames.reaction, [1 1001 2102], 1, 'reaction');
 fprintf(fid,'file delete %s\n', filenames.nodeCoords);
@@ -124,6 +128,9 @@ results.story_disp_x = temp;
 temp = dlmread(filenames.disp_all);
 results.disp_x = temp(:, 1:2:end);
 results.disp_y = temp(:, 2:2:end);
+
+results.energy_disp_y = dlmread(filenames.energy_disp);
+results.energy_vel_x = dlmread(filenames.energy_vel);
 
 coords = OpenSees.readNodeCoords(filenames.nodeCoords, 2);
 results.coords_x = coords(:,1)';

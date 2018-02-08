@@ -122,6 +122,13 @@ function n = nBeamNodes(obj,story)
     end
 end
 
+function tags = massNodes(obj)
+    tags = [
+        obj.tag('left', 1:obj.nStories, 1)' ;
+        obj.tag('right', 1:obj.nStories, 1)';
+        obj.tag('lean', 1:obj.nStories, 1)';
+    ];
+end
 
 end %methods
 
