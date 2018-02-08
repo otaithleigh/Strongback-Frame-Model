@@ -1,13 +1,6 @@
 function simpleNodeNumbering(obj, fid)
 %simpleNodeNumbering
 %
-%   This function is to get things up and running. It does not allow for custom
-%   numbers of elements per member. It establishes the following setup:
-%       1 element per column
-%       2 elements per beam (split at brace connection point)
-%       2 elements per brace
-%
-%
 
 % Ground nodes -----------------------------------------------------------------
 fprintf(fid, 'node %4i 0 0\n',  obj.tag('left', 0, 0));
@@ -103,7 +96,7 @@ for iStory = 1:obj.nStories
     y = floorBelowHeight(iStory);
     tag = obj.tag('lean', iStory, 2);
     fprintf(fid, 'node %4i %g %g\n', tag, x, y);
-    
+
 
     % Beams --------------------------------------------------------------------
     x = [];
@@ -170,38 +163,38 @@ for iStory = 1:obj.nStories
     end
 
     % Left braces --------------------------------------------------------------
-    x = [];
-    y = [];
     plateBelow = obj.GussetPlates{iStory, 1, 1};
     plateAbove = obj.GussetPlates{iStory, 1, 2};
     rigidBelowLength = plateBelow.L4 + plateBelow.L2;
-    rigidAboveLength = plateAbove.L4 + plateAbove.L2;
-    xDiff = (obj.bracePos*obj.bayWidth - (rigidBelowLength + rigidAboveLength)*cosd(plateBelow.alpha))/obj.nBraceEle;
-    yDiff = (obj.storyHeight(iStory) - (rigidBelowLength + rigidAboveLength)*sind(plateBelow.alpha))/obj.nBraceEle;
+    rigidAboveLength = plateAbove.L4 + plateBelow.L2;
+    L = obj.storyHeight(iStory) * cscd(plateBelow.alpha) - rigidBelowLength - rigidAboveLength;
+    x_brace_coord = rigidBelowLength + linspace(0, L, obj.nBraceEle+1);
+    y_brace_coord = obj.imperf * L * sin(pi*(x_brace_coord-rigidBelowLength)/L);
 
-    % Odd story
     if mod(iStory,2) ~= 0
-        x(1) = rigidBelowLength*cosd(plateBelow.alpha);
+        % Odd story
+        R = [cosd(plateBelow.alpha), -sind(plateBelow.alpha)
+             sind(plateBelow.alpha),  cosd(plateBelow.alpha)];
     else
-        x(1) = obj.bracePos*obj.bayWidth - rigidBelowLength*cosd(plateBelow.alpha);
+        % Even story
+        R = [cosd(180-plateBelow.alpha), -sind(180-plateBelow.alpha)
+             sind(180-plateBelow.alpha),  cosd(180-plateBelow.alpha)];
     end
-    x(2) = x(1);
 
-    y(1) = rigidBelowLength*sind(plateBelow.alpha);
-    y(2) = y(1);
+    rot = R*[x_brace_coord;y_brace_coord];
+    x = [rot(1,1), rot(1,:), rot(1,end)];
+    y = [rot(2,1), rot(2,:), rot(2,end)];
 
-    for iNode = 1:obj.nBraceEle
-        if mod(iStory,2) ~= 0
-            x(2+iNode) = x(2) + iNode*xDiff;
-        else
-            x(2+iNode) = x(2) - iNode*xDiff;
-        end
-        y(2+iNode) = y(2) + iNode*yDiff;
+    if mod(iStory,2) ~= 0
+        % Odd story
+        % x = x
+    else
+        % Even story
+        x = x + obj.bracePos*obj.bayWidth;
     end
-    x(obj.nBraceNodes) = x(obj.nBraceNodes-1);
-    y(obj.nBraceNodes) = y(obj.nBraceNodes-1);
 
     y = y + floorBelowHeight(iStory);
+
     for iNode = 1:obj.nBraceNodes
         tag = obj.tag('brace', iStory, iNode);
         fprintf(fid, 'node %4i %g %g\n', tag, x(iNode), y(iNode));
@@ -209,39 +202,38 @@ for iStory = 1:obj.nStories
 
 
     % Right braces -------------------------------------------------------------
-    x = [];
-    y = [];
     plateBelow = obj.GussetPlates{iStory, 2, 1};
     plateAbove = obj.GussetPlates{iStory, 2, 2};
     rigidBelowLength = plateBelow.L4 + plateBelow.L2;
-    rigidAboveLength = plateAbove.L4 + plateAbove.L2;
-    xDiff = ((1-obj.bracePos)*obj.bayWidth - (rigidBelowLength + rigidAboveLength)*cosd(plateBelow.alpha))/obj.nBraceEle;
-    yDiff = (obj.storyHeight(iStory) - (rigidBelowLength + rigidAboveLength)*sind(plateBelow.alpha))/obj.nBraceEle;
+    rigidAboveLength = plateAbove.L4 + plateBelow.L2;
+    L = obj.storyHeight(iStory) * cscd(plateBelow.alpha) - rigidBelowLength - rigidAboveLength;
+    x_brace_coord = rigidBelowLength + linspace(0, L, obj.nBraceEle+1);
+    y_brace_coord = obj.imperf * L * sin(pi*(x_brace_coord-rigidBelowLength)/L);
 
     if mod(iStory,2) ~= 0
         % Odd story
-        x(1) = obj.bayWidth - rigidBelowLength*cosd(plateBelow.alpha);
+        R = [cosd(180-plateBelow.alpha), -sind(180-plateBelow.alpha)
+             sind(180-plateBelow.alpha),  cosd(180-plateBelow.alpha)];
     else
         % Even story
-        x(1) = obj.bracePos*obj.bayWidth + rigidBelowLength*cosd(plateBelow.alpha);
+        R = [cosd(plateBelow.alpha), -sind(plateBelow.alpha)
+             sind(plateBelow.alpha),  cosd(plateBelow.alpha)];
     end
-    x(2) = x(1);
 
-    y(1) = rigidBelowLength*sind(plateBelow.alpha);
-    y(2) = y(1);
+    rot = R*[x_brace_coord;y_brace_coord];
+    x = [rot(1,1), rot(1,:), rot(1,end)];
+    y = [rot(2,1), rot(2,:), rot(2,end)];
 
-    for iNode = 1:obj.nBraceEle
-        if mod(iStory,2) ~= 0
-            x(2+iNode) = x(2) - iNode*xDiff;
-        else
-            x(2+iNode) = x(2) + iNode*xDiff;
-        end
-        y(2+iNode) = y(2) + iNode*yDiff;
+    if mod(iStory,2) ~= 0
+        % Odd story
+        x = x + obj.bayWidth;
+    else
+        % Even story
+        x = x + obj.bracePos*obj.bayWidth;
     end
-    x(obj.nBraceNodes) = x(obj.nBraceNodes-1);
-    y(obj.nBraceNodes) = y(obj.nBraceNodes-1);
 
     y = y + floorBelowHeight(iStory);
+
     for iNode = 1:obj.nBraceNodes
         tag = obj.tag('sback', iStory, iNode);
         fprintf(fid, 'node %4i %g %g\n', tag, x(iNode), y(iNode));
