@@ -54,6 +54,7 @@ filenames.nodeCoords    = obj.scratchFile(sprintf('%s_pushover_node_coord.out', 
 filenames.base_shear    = obj.scratchFile(sprintf('%s_pushover_base_shear.out', class(obj)));
 filenames.local_brace   = obj.scratchFile(sprintf('%s_pushover_local_brace.out', class(obj)));
 filenames.local_sback   = obj.scratchFile(sprintf('%s_pushover_local_sback.out', class(obj)));
+filenames.local_tie     = obj.scratchFile(sprintf('%s_pushover_local_tie.out', class(obj)));
 
 
 %############################## Create .tcl file ##############################%
@@ -80,6 +81,7 @@ fprintf(fid,'recorder Node -file {%s} -nodeRange 0 %i -dof 1 2 disp\n',filenames
 OpenSees.nodeRecorder(fid, filenames.story_disp, obj.tag('right',1:obj.nStories,1), 1, 'disp');
 OpenSees.eleRecorder(fid, filenames.local_brace, obj.tag('brace',1:obj.nStories,1:obj.nBraceEle), [], 'localForce');
 OpenSees.eleRecorder(fid, filenames.local_sback, obj.tag('sback',1:obj.nStories,1:obj.nBraceEle), [], 'localForce');
+OpenSees.eleRecorder(fid, filenames.local_tie,   obj.tag('tie',  1:obj.nStories,1:obj.nBraceEle), [], 'localForce');
 
 fprintf(fid,'file delete %s\n', filenames.nodeCoords);
 fprintf(fid,'print {%s} -node\n', filenames.nodeCoords);
@@ -193,6 +195,19 @@ results.sback_shear = shear;
 moment              = temp(:,3:3:end);
 moment(:,1:2:end)   = -moment(:,1:2:end);
 results.sback_moment = moment;
+
+if ~all(cellfun(@isempty, obj.TieBraces))
+    temp = dlmread(filenames.local_tie);
+    axial               = temp(:,1:3:end);
+    axial(:,1:2:end)    = -axial(:,1:2:end);
+    results.tie_axial   = axial;
+    shear               = temp(:,2:3:end);
+    shear(:,2:2:end)    = -shear(:,2:2:end);
+    results.tie_shear   = shear;
+    moment              = temp(:,3:3:end);
+    moment(:,1:2:end)   = -moment(:,1:2:end);
+    results.tie_moment  = moment;
+end
 
 %------------------------------ Computed Results ------------------------------%
 storyDrift                  = results.story_disp_x;
