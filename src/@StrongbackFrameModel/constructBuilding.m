@@ -221,13 +221,15 @@ for iType = {'brace', 'sback'}
 end
 
 % Attach tie braces to beams
-for iStory = 2:obj.nStories-1
-    rTag = obj.tag('beam', iStory-1, obj.beamCenterNode(iStory-1));
-    cTag = obj.tag('tie', iStory, 1);
-    fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
-    rTag = obj.tag('beam', iStory, obj.beamCenterNode(iStory));
-    cTag = obj.tag('tie', iStory, obj.nBraceEle+1);
-    fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+for iStory = 2:obj.nStories
+    if ~isempty(obj.TieBraces{iStory})
+        rTag = obj.tag('beam', iStory-1, obj.beamCenterNode(iStory-1));
+        cTag = obj.tag('tie', iStory, 1);
+        fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+        rTag = obj.tag('beam', iStory, obj.beamCenterNode(iStory));
+        cTag = obj.tag('tie', iStory, obj.nBraceEle+1);
+        fprintf(fid, 'equalDOF %4i %4i 1 2\n', rTag, cTag);
+    end
 end
 
 % Tie leaning frame together

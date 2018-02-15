@@ -74,11 +74,15 @@ case 2
     end
 end
 
-switch Column.shape.Type
-case 'W'
-    Plate.dc = Column.shape.d;
-case 'HSS'
-    Plate.dc = Column.shape.Ht;
+if isempty(Column)
+    Plate.dc = 0;
+else
+    switch Column.shape.Type
+    case 'W'
+        Plate.dc = Column.shape.d;
+    case 'HSS'
+        Plate.dc = Column.shape.Ht;
+    end
 end
 
 Plate.alpha = Brace.alpha;

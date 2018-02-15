@@ -168,6 +168,8 @@ for iStory = 1:obj.nStories
     rigidBelowLength = plateBelow.L4 + plateBelow.L2;
     rigidAboveLength = plateAbove.L4 + plateBelow.L2;
     L = obj.storyHeight(iStory) * cscd(plateBelow.alpha) - rigidBelowLength - rigidAboveLength;
+
+    % Plop out x and y coordinates on a line, then rotate to correct position.
     x_brace_coord = rigidBelowLength + linspace(0, L, obj.nBraceEle+1);
     y_brace_coord = obj.imperf * L * sin(pi*(x_brace_coord-rigidBelowLength)/L);
 
@@ -207,6 +209,8 @@ for iStory = 1:obj.nStories
     rigidBelowLength = plateBelow.L4 + plateBelow.L2;
     rigidAboveLength = plateAbove.L4 + plateBelow.L2;
     L = obj.storyHeight(iStory) * cscd(plateBelow.alpha) - rigidBelowLength - rigidAboveLength;
+
+    % Plop out x and y coordinates on a line, then rotate to correct position.
     x_brace_coord = rigidBelowLength + linspace(0, L, obj.nBraceEle+1);
     y_brace_coord = obj.imperf * L * sin(pi*(x_brace_coord-rigidBelowLength)/L);
 
@@ -241,7 +245,7 @@ for iStory = 1:obj.nStories
 
     % Tie braces ---------------------------------------------------------------
     % for now, stick them to the beams
-    if (iStory ~= 1) && (iStory ~= obj.nStories)
+    if ~isempty(obj.TieBraces{iStory})
         x = obj.bracePos*obj.bayWidth;
         for iNode = 1:obj.nBraceEle+1
             y = floorBelowHeight(iStory) + (iNode-1)/obj.nBraceEle * obj.storyHeight(iStory);
